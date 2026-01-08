@@ -7,7 +7,48 @@ import { Search, Loader2 } from "lucide-react";
 import { getWeatherData, type WeatherData } from "@/lib/weather";
 import { getWeatherAdvice } from "@/lib/getAdvice";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Cloud, Droplets, Thermometer, Wind } from "lucide-react";
+import { 
+  Cloud, 
+  Droplets, 
+  Thermometer, 
+  Wind, 
+  Sun, 
+  CloudRain, 
+  CloudSnow, 
+  CloudLightning, 
+  CloudDrizzle, 
+  CloudFog,
+} from "lucide-react";
+
+const WeatherIcon = ({ condition, className }: { condition: string; className?: string }) => {
+  switch (condition.toLowerCase()) {
+    case "clear":
+      return <Sun className={className} />;
+    case "clouds":
+      return <Cloud className={className} />;
+    case "rain":
+      return <CloudRain className={className} />;
+    case "drizzle":
+      return <CloudDrizzle className={className} />;
+    case "thunderstorm":
+      return <CloudLightning className={className} />;
+    case "snow":
+      return <CloudSnow className={className} />;
+    case "mist":
+    case "smoke":
+    case "haze":
+    case "dust":
+    case "fog":
+    case "sand":
+    case "ash":
+    case "squall":
+      return <CloudFog className={className} />;
+    case "tornado":
+      return <Wind className={className} />;
+    default:
+      return <Cloud className={className} />;
+  }
+};
 
 export default function Home() {
   const [city, setCity] = useState("");
@@ -82,13 +123,14 @@ export default function Home() {
                   <div className="flex-1 p-8 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 flex flex-col justify-center items-center md:items-start space-y-2">
                     <p className="text-lg font-medium opacity-80">{weather.name}, {weather.sys.country}</p>
                     <div className="flex items-center gap-4">
+                      <WeatherIcon condition={weather.weather[0].main} className="h-16 w-16" />
                       <span className="text-7xl font-bold">{Math.round(weather.main.temp)}°C</span>
                     </div>
                     <p className="text-xl capitalize">{weather.weather[0].description}</p>
                   </div>
                   <div className="flex-1 p-8 bg-blue-600 text-white flex flex-col justify-center items-center text-center space-y-4">
                     <div className="bg-white/20 p-4 rounded-full">
-                      <Cloud className="h-12 w-12" />
+                      <WeatherIcon condition={weather.weather[0].main} className="h-12 w-12" />
                     </div>
                     <div>
                       <h3 className="text-sm font-bold uppercase tracking-wider opacity-80">Today&apos;s Advice</h3>
