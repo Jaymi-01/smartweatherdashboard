@@ -50,6 +50,21 @@ const WeatherIcon = ({ condition, className }: { condition: string; className?: 
   }
 };
 
+const getFormattedDate = () => {
+  const date = new Date();
+  const dayName = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date);
+  const dayNumber = date.getDate();
+  const monthName = new Intl.DateTimeFormat("en-US", { month: "long" }).format(date);
+
+  const getOrdinal = (n: number) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return s[(v - 20) % 10] || s[v] || s[0];
+  };
+
+  return `${dayName}, ${dayNumber}${getOrdinal(dayNumber)} ${monthName}`;
+};
+
 export default function Home() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -121,12 +136,15 @@ export default function Home() {
               <CardContent className="p-0">
                 <div className="flex flex-col md:flex-row">
                   <div className="flex-1 p-8 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 flex flex-col justify-center items-center md:items-start space-y-2">
-                    <p className="text-lg font-medium opacity-80">{weather.name}, {weather.sys.country}</p>
-                    <div className="flex items-center gap-4">
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-medium opacity-60 uppercase tracking-wider">{getFormattedDate()}</p>
+                      <p className="text-2xl font-bold">{weather.name}, {weather.sys.country}</p>
+                    </div>
+                    <div className="flex items-center gap-4 py-4">
                       <WeatherIcon condition={weather.weather[0].main} className="h-16 w-16" />
                       <span className="text-7xl font-bold">{Math.round(weather.main.temp)}°C</span>
                     </div>
-                    <p className="text-xl capitalize">{weather.weather[0].description}</p>
+                    <p className="text-xl capitalize font-medium">{weather.weather[0].description}</p>
                   </div>
                   <div className="flex-1 p-8 bg-blue-600 text-white flex flex-col justify-center items-center text-center space-y-4">
                     <div className="bg-white/20 p-4 rounded-full">
