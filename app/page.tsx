@@ -3,14 +3,30 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
+import { getWeatherData, type WeatherData } from "@/lib/weather";
 
 export default function Home() {
   const [city, setCity] = useState("");
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching for:", city);
+    if (!city.trim()) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getWeatherData(city);
+      setWeather(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+      setWeather(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,10 +50,28 @@ export default function Home() {
               className="pl-9"
               value={city}
               onChange={(e) => setCity(e.target.value)}
+              disabled={loading}
             />
           </div>
-          <Button type="submit">Search</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
+          </Button>
         </form>
+
+        {error && (
+          <div className="max-w-md mx-auto p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm text-center">
+            {error}
+          </div>
+        )}
+
+        {weather && (
+          <div className="max-w-md mx-auto p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm space-y-2">
+            <h2 className="text-xl font-semibold">Verification Dump:</h2>
+            <p><span className="font-bold">City:</span> {weather.name}</p>
+            <p><span className="font-bold">Temperature:</span> {Math.round(weather.main.temp)}°C</p>
+            <p><span className="font-bold">Description:</span> {weather.weather[0].description}</p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Weather data cards will go here */}
