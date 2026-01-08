@@ -36,30 +36,34 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <main className="min-h-screen p-4 md:p-8 flex items-center justify-center">
+      <div className="max-w-4xl w-full mx-auto space-y-8 bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-xl p-6 md:p-12">
         <header className="flex flex-col items-center gap-4 text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-md">
             Smart Weather Dashboard
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400">
+          <p className="text-zinc-100 font-medium drop-shadow-sm">
             Real-time weather insights for any city.
           </p>
         </header>
 
         <form onSubmit={handleSearch} className="flex w-full max-w-md mx-auto items-center space-x-2">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
             <Input
               type="text"
               placeholder="Enter city name..."
-              className="pl-9"
+              className="pl-9 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus-visible:ring-white/30"
               value={city}
               onChange={(e) => setCity(e.target.value)}
               disabled={loading}
             />
           </div>
-          <Button type="submit" disabled={loading}>
+          <Button 
+            type="submit" 
+            disabled={loading}
+            className="bg-white/20 hover:bg-white/30 text-white border border-white/20 transition-all shadow-lg"
+          >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
           </Button>
         </form>
