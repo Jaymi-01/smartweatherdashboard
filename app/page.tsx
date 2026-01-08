@@ -5,12 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Loader2 } from "lucide-react";
 import { getWeatherData, type WeatherData } from "@/lib/weather";
+import { getWeatherAdvice } from "@/lib/getAdvice";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Cloud, Droplets, Thermometer, Wind } from "lucide-react";
 
 export default function Home() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [advice, setAdvice] = useState<string>("");
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,9 +22,11 @@ export default function Home() {
 
     setLoading(true);
     setError(null);
+    setAdvice("");
     try {
       const data = await getWeatherData(city);
       setWeather(data);
+      setAdvice(getWeatherAdvice(data.main.temp, data.weather[0].main));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setWeather(null);
@@ -65,17 +71,61 @@ export default function Home() {
         )}
 
         {weather && (
-          <div className="max-w-md mx-auto p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm space-y-2">
-            <h2 className="text-xl font-semibold">Verification Dump:</h2>
-            <p><span className="font-bold">City:</span> {weather.name}</p>
-            <p><span className="font-bold">Temperature:</span> {Math.round(weather.main.temp)}°C</p>
-            <p><span className="font-bold">Description:</span> {weather.weather[0].description}</p>
+          <div className="space-y-6">
+            <Card className="overflow-hidden">
+              <CardContent className="p-0">
+                <div className="flex flex-col md:flex-row">
+                  <div className="flex-1 p-8 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 flex flex-col justify-center items-center md:items-start space-y-2">
+                    <p className="text-lg font-medium opacity-80">{weather.name}, {weather.sys.country}</p>
+                    <div className="flex items-center gap-4">
+                      <span className="text-7xl font-bold">{Math.round(weather.main.temp)}°C</span>
+                    </div>
+                    <p className="text-xl capitalize">{weather.weather[0].description}</p>
+                  </div>
+                  <div className="flex-1 p-8 bg-blue-600 text-white flex flex-col justify-center items-center text-center space-y-4">
+                    <div className="bg-white/20 p-4 rounded-full">
+                      <Cloud className="h-12 w-12" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold uppercase tracking-wider opacity-80">Today&apos;s Advice</h3>
+                      <p className="text-2xl font-semibold leading-tight">{advice}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-zinc-500">Feels Like</CardTitle>
+                  <Thermometer className="h-4 w-4 text-zinc-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{Math.round(weather.main.feels_like)}°C</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-zinc-500">Humidity</CardTitle>
+                  <Droplets className="h-4 w-4 text-zinc-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{weather.main.humidity}%</div>
+                </CardContent>
+              </Card>
+              <Card className="sm:col-span-2 lg:col-span-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-zinc-500">Wind Speed</CardTitle>
+                  <Wind className="h-4 w-4 text-zinc-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{weather.wind.speed} m/s</div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Weather data cards will go here */}
-        </div>
       </div>
     </main>
   );
